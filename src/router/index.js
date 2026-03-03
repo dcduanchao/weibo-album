@@ -2,6 +2,11 @@ import { createRouter, createWebHistory } from 'vue-router'
 import FetchView from '../views/FetchView.vue'
 import RecordsView from '../views/RecordsView.vue'
 import AlbumView from '../views/AlbumView.vue'
+import ComfyUIView from '../views/ComfyUIView.vue'
+import ComfyUIEditListView from '../views/ComfyUIEditListView.vue'
+import ComfyUICreateView from '../views/ComfyUICreateView.vue'
+import ComfyUICreateListView from '../views/ComfyUICreateListView.vue'
+import ComfyUIInfoView from '../views/ComfyUIInfoView.vue'
 
 const routes = [
   {
@@ -18,6 +23,31 @@ const routes = [
     path: '/album/:uid',
     name: 'Album',
     component: AlbumView
+  },
+  {
+    path: '/comfyui',
+    name: 'ComfyUI',
+    component: ComfyUIView
+  },
+  {
+    path: '/comfyui/info',
+    name: 'ComfyUIInfo',
+    component: ComfyUIInfoView
+  },
+  {
+    path: '/comfyui/edit/list',
+    name: 'ComfyUIEditList',
+    component: ComfyUIEditListView
+  },
+  {
+    path: '/comfyui/create',
+    name: 'ComfyUICreate',
+    component: ComfyUICreateView
+  },
+  {
+    path: '/comfyui/create/list',
+    name: 'ComfyUICreateList',
+    component: ComfyUICreateListView
   }
 ]
 

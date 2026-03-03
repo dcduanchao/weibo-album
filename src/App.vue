@@ -10,22 +10,78 @@
           {{ showMobileMenu ? "✕" : "☰" }}
         </button>
         <nav class="nav-menu" :class="{ show: showMobileMenu }">
-          <router-link
-            to="/"
-            class="nav-item"
-            :class="{ active: $route.path === '/' }"
-            @click="closeMenu"
-          >
-            🚀 抓取
-          </router-link>
-          <router-link
-            to="/records"
-            class="nav-item"
-            :class="{ active: $route.path === '/records' }"
-            @click="closeMenu"
-          >
-            📋 抓取记录
-          </router-link>
+          <div class="nav-dropdown" :class="{ show: showWeiboMenu }">
+            <div class="nav-dropdown-trigger" @click="toggleWeiboMenu">
+              📱 微博
+              <span class="dropdown-arrow">▼</span>
+            </div>
+            <div class="nav-dropdown-menu">
+              <router-link
+                to="/"
+                class="nav-dropdown-item"
+                :class="{ active: $route.path === '/' }"
+                @click="closeMenu"
+              >
+                🚀 抓取
+              </router-link>
+              <router-link
+                to="/records"
+                class="nav-dropdown-item"
+                :class="{ active: $route.path === '/records' }"
+                @click="closeMenu"
+              >
+                📋 抓取记录
+              </router-link>
+            </div>
+          </div>
+          <div class="nav-dropdown" :class="{ show: showComfyMenu }">
+            <div class="nav-dropdown-trigger" @click="toggleComfyMenu">
+              🎨 ComfyUI
+              <span class="dropdown-arrow">▼</span>
+            </div>
+            <div class="nav-dropdown-menu">
+              <router-link
+                to="/comfyui/info"
+                class="nav-dropdown-item"
+                :class="{ active: $route.path === '/comfyui/info' }"
+                @click="closeMenu"
+              >
+                ℹ️ ComfyUI 信息
+              </router-link>
+              <router-link
+                to="/comfyui"
+                class="nav-dropdown-item"
+                :class="{ active: $route.path === '/comfyui' }"
+                @click="closeMenu"
+              >
+                ✏️ 编辑图片
+              </router-link>
+              <router-link
+                to="/comfyui/edit/list"
+                class="nav-dropdown-item"
+                :class="{ active: $route.path === '/comfyui/edit/list' }"
+                @click="closeMenu"
+              >
+                📝 编辑列表
+              </router-link>
+              <router-link
+                to="/comfyui/create"
+                class="nav-dropdown-item"
+                :class="{ active: $route.path === '/comfyui/create' }"
+                @click="closeMenu"
+              >
+                🎨 生成图片
+              </router-link>
+              <router-link
+                to="/comfyui/create/list"
+                class="nav-dropdown-item"
+                :class="{ active: $route.path === '/comfyui/create/list' }"
+                @click="closeMenu"
+              >
+                📋 生成列表
+              </router-link>
+            </div>
+          </div>
         </nav>
         <div class="user-section">
           <template v-if="isLoggedIn">
@@ -126,6 +182,8 @@ import { ref, onMounted, onUnmounted } from "vue";
 const showMobileMenu = ref(false);
 const showUserMenu = ref(false);
 const showLoginModal = ref(false);
+const showWeiboMenu = ref(false);
+const showComfyMenu = ref(false);
 const isLoggedIn = ref(false);
 
 const userInfo = ref({
@@ -146,6 +204,18 @@ const toggleMenu = () => {
 
 const closeMenu = () => {
   showMobileMenu.value = false;
+  showWeiboMenu.value = false;
+  showComfyMenu.value = false;
+};
+
+const toggleWeiboMenu = () => {
+  showWeiboMenu.value = !showWeiboMenu.value;
+  showComfyMenu.value = false;
+};
+
+const toggleComfyMenu = () => {
+  showComfyMenu.value = !showComfyMenu.value;
+  showWeiboMenu.value = false;
 };
 
 const toggleUserMenu = () => {
@@ -187,8 +257,16 @@ const logout = () => {
 
 const handleClickOutside = (event) => {
   const userInfoElement = document.querySelector(".user-info");
+  const weiboDropdown = document.querySelector(".nav-dropdown:nth-child(1)");
+  const comfyDropdown = document.querySelector(".nav-dropdown:nth-child(2)");
+
   if (userInfoElement && !userInfoElement.contains(event.target)) {
     showUserMenu.value = false;
+  }
+
+  if (!event.target.closest(".nav-dropdown")) {
+    showWeiboMenu.value = false;
+    showComfyMenu.value = false;
   }
 };
 
@@ -310,6 +388,78 @@ onUnmounted(() => {
 
 .dropdown-item.logout:hover {
   background: #fef0f0;
+}
+
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border-radius: 6px;
+}
+
+.nav-dropdown-trigger:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-dropdown-trigger .dropdown-arrow {
+  font-size: 10px;
+  transition: transform 0.25s ease;
+}
+
+.nav-dropdown.show .nav-dropdown-trigger .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  min-width: 160px;
+  padding: 8px 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.25s ease;
+  z-index: 1000;
+}
+
+.nav-dropdown.show .nav-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.nav-dropdown-item {
+  display: block;
+  padding: 10px 16px;
+  color: var(--text-primary);
+  font-size: 14px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+
+.nav-dropdown-item:hover {
+  background: var(--bg-secondary);
+}
+
+.nav-dropdown-item.active {
+  color: var(--primary-color);
+  background: rgba(64, 158, 255, 0.1);
 }
 
 .login-modal {

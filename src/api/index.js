@@ -90,4 +90,40 @@ export const deleteRecord = (id) => {
   })
 }
 
+// ComfyUI 编辑图片
+export const comfyuiEdit = (data) => {
+  return api.post('/comfyui/edit', data)
+}
+
+// 获取 ComfyUI 编辑列表
+export const getComfyuiEditList = (page = 1, pageSize = 20) => {
+  return api.get('/comfyui/edit/list', {
+    params: { page, page_size: pageSize, c_type: 1 }
+  })
+}
+
+// ComfyUI 生成图片
+export const comfyuiCreate = (data) => {
+  return api.post('/comfyui/create', data)
+}
+
+// 获取 ComfyUI 生成列表
+export const getComfyuiCreateList = (page = 1, pageSize = 20) => {
+  return api.get('/comfyui/edit/list', {
+    params: { page, page_size: pageSize, c_type: 0 }
+  })
+}
+
+// 删除 ComfyUI 编辑记录
+export const deleteComfyuiEdit = (id) => {
+  return api.get('/comfyui/image/delete', {
+    params: { id }
+  })
+}
+
+// 重启 ComfyUI 按钮
+export const rebootComfyui = () => {
+  return api.get('/comfyui/reboot')
+}
+
 export default api
