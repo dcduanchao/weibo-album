@@ -7,6 +7,10 @@ import ComfyUIEditListView from '../views/ComfyUIEditListView.vue'
 import ComfyUICreateView from '../views/ComfyUICreateView.vue'
 import ComfyUICreateListView from '../views/ComfyUICreateListView.vue'
 import ComfyUIInfoView from '../views/ComfyUIInfoView.vue'
+import GrokImageView from '../views/GrokImageView.vue'
+import GrokEditView from '../views/GrokEditView.vue'
+import GrokVideoView from '../views/GrokVideoView.vue'
+import GrokListView from '../views/GrokListView.vue'
 
 const routes = [
   {
@@ -48,6 +52,26 @@ const routes = [
     path: '/comfyui/create/list',
     name: 'ComfyUICreateList',
     component: ComfyUICreateListView
+  },
+  {
+    path: '/grok/image',
+    name: 'GrokImage',
+    component: GrokImageView
+  },
+  {
+    path: '/grok/edit',
+    name: 'GrokEdit',
+    component: GrokEditView
+  },
+  {
+    path: '/grok/video',
+    name: 'GrokVideo',
+    component: GrokVideoView
+  },
+  {
+    path: '/grok/list',
+    name: 'GrokList',
+    component: GrokListView
   }
 ]
 

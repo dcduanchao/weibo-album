@@ -126,4 +126,23 @@ export const rebootComfyui = () => {
   return api.get('/comfyui/reboot')
 }
 
+// Grok 生成接口
+export const grokGen = (data) => {
+  return api.post('/grok/gen', data)
+}
+
+// 获取 Grok 生成列表
+export const getGrokList = (page = 1, pageSize = 20) => {
+  return api.get('/grok/list', {
+    params: { page, page_size: pageSize }
+  })
+}
+
+// 删除 Grok 记录
+export const deleteGrok = (id) => {
+  return api.get('/grok/delete', {
+    params: { id }
+  })
+}
+
 export default api

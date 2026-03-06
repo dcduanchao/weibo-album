@@ -97,6 +97,34 @@
             </div>
           </template>
         </el-table-column>
+        <el-table-column label="参考图" width="150" align="center">
+          <template #default="{ row }">
+            <div
+              v-if="row.ref_url && row.ref_url.length > 0"
+              class="ref-images"
+            >
+              <el-image
+                v-for="(url, index) in row.ref_url.slice(0, 3)"
+                :key="index"
+                :src="url"
+                :preview-src-list="row.ref_url"
+                :initial-index="index"
+                fit="cover"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  border-radius: 4px;
+                  margin: 2px;
+                "
+                preview-teleported
+              />
+              <span v-if="row.ref_url.length > 3" class="ref-more">
+                +{{ row.ref_url.length - 3 }}
+              </span>
+            </div>
+            <span v-else class="no-ref">无</span>
+          </template>
+        </el-table-column>
         <el-table-column label="生成的图片" width="120" align="center">
           <template #default="{ row }">
             <el-image
@@ -181,7 +209,10 @@ const loadList = async () => {
   try {
     const res = await getComfyuiCreateList(page.value, pageSize.value);
     if (res.data.code === 200) {
-      list.value = res.data.data.list || [];
+      list.value = (res.data.data.list || []).map((item) => ({
+        ...item,
+        ref_url: parseRefUrl(item.ref_url),
+      }));
       total.value = res.data.data.total || 0;
     } else {
       ElMessage.error(res.data.msg || "加载失败");
@@ -192,6 +223,29 @@ const loadList = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const parseRefUrl = (refUrl) => {
+  console.log("原始 ref_url:", refUrl, "类型:", typeof refUrl);
+  if (!refUrl) return [];
+  if (Array.isArray(refUrl)) {
+    console.log("已经是数组，长度:", refUrl.length);
+    return refUrl;
+  }
+  if (typeof refUrl === "string") {
+    try {
+      const parsed = JSON.parse(refUrl);
+      console.log("JSON解析后:", parsed, "是数组:", Array.isArray(parsed));
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      console.log("JSON解析失败，尝试正则提取");
+      const urlRegex = /http[^\s\]]+/g;
+      const urls = refUrl.match(urlRegex) || [];
+      console.log("正则提取结果:", urls);
+      return urls;
+    }
+  }
+  return [];
 };
 
 const changePage = (newPage) => {
@@ -320,6 +374,27 @@ onMounted(() => {
 
 .copy-btn:hover {
   opacity: 1;
+}
+
+.ref-images {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.ref-more {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.no-ref {
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
 .pagination {

@@ -82,6 +82,46 @@
               </router-link>
             </div>
           </div>
+          <div class="nav-dropdown" :class="{ show: showGrokMenu }">
+            <div class="nav-dropdown-trigger" @click="toggleGrokMenu">
+              🤖 Grok
+              <span class="dropdown-arrow">▼</span>
+            </div>
+            <div class="nav-dropdown-menu">
+              <router-link
+                to="/grok/image"
+                class="nav-dropdown-item"
+                :class="{ active: $route.path === '/grok/image' }"
+                @click="closeMenu"
+              >
+                🎨 图片生成
+              </router-link>
+              <router-link
+                to="/grok/edit"
+                class="nav-dropdown-item"
+                :class="{ active: $route.path === '/grok/edit' }"
+                @click="closeMenu"
+              >
+                ✏️ 编辑图片
+              </router-link>
+              <router-link
+                to="/grok/video"
+                class="nav-dropdown-item"
+                :class="{ active: $route.path === '/grok/video' }"
+                @click="closeMenu"
+              >
+                🎬 视频生成
+              </router-link>
+              <router-link
+                to="/grok/list"
+                class="nav-dropdown-item"
+                :class="{ active: $route.path === '/grok/list' }"
+                @click="closeMenu"
+              >
+                📋 生成列表
+              </router-link>
+            </div>
+          </div>
         </nav>
         <div class="user-section">
           <template v-if="isLoggedIn">
@@ -184,6 +224,7 @@ const showUserMenu = ref(false);
 const showLoginModal = ref(false);
 const showWeiboMenu = ref(false);
 const showComfyMenu = ref(false);
+const showGrokMenu = ref(false);
 const isLoggedIn = ref(false);
 
 const userInfo = ref({
@@ -206,16 +247,25 @@ const closeMenu = () => {
   showMobileMenu.value = false;
   showWeiboMenu.value = false;
   showComfyMenu.value = false;
+  showGrokMenu.value = false;
 };
 
 const toggleWeiboMenu = () => {
   showWeiboMenu.value = !showWeiboMenu.value;
   showComfyMenu.value = false;
+  showGrokMenu.value = false;
 };
 
 const toggleComfyMenu = () => {
   showComfyMenu.value = !showComfyMenu.value;
   showWeiboMenu.value = false;
+  showGrokMenu.value = false;
+};
+
+const toggleGrokMenu = () => {
+  showGrokMenu.value = !showGrokMenu.value;
+  showWeiboMenu.value = false;
+  showComfyMenu.value = false;
 };
 
 const toggleUserMenu = () => {

@@ -108,6 +108,34 @@
             />
           </template>
         </el-table-column>
+        <el-table-column label="参考图" width="150" align="center">
+          <template #default="{ row }">
+            <div
+              v-if="row.ref_url && row.ref_url.length > 0"
+              class="ref-images"
+            >
+              <el-image
+                v-for="(url, index) in row.ref_url.slice(0, 3)"
+                :key="index"
+                :src="url"
+                :preview-src-list="row.ref_url"
+                :initial-index="index"
+                fit="cover"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  border-radius: 4px;
+                  margin: 2px;
+                "
+                preview-teleported
+              />
+              <span v-if="row.ref_url.length > 3" class="ref-more">
+                +{{ row.ref_url.length - 3 }}
+              </span>
+            </div>
+            <span v-else class="no-ref">无</span>
+          </template>
+        </el-table-column>
         <el-table-column label="编辑后" width="120" align="center">
           <template #default="{ row }">
             <el-image
@@ -195,6 +223,26 @@
             <img :src="currentItem.minio_url" alt="编辑后" />
           </div>
         </div>
+        <div
+          v-if="currentItem.ref_url && currentItem.ref_url.length > 0"
+          class="ref-section"
+        >
+          <div class="ref-title">
+            参考图（{{ currentItem.ref_url.length }}张）
+          </div>
+          <div class="ref-grid">
+            <el-image
+              v-for="(url, index) in currentItem.ref_url"
+              :key="index"
+              :src="url"
+              :preview-src-list="currentItem.ref_url"
+              :initial-index="index"
+              fit="cover"
+              class="ref-image"
+              preview-teleported
+            />
+          </div>
+        </div>
       </div>
       <div class="preview-info">
         <div class="info-item">
@@ -235,7 +283,10 @@ const loadList = async () => {
   try {
     const res = await getComfyuiEditList(page.value, pageSize.value);
     if (res.data.code === 200) {
-      list.value = res.data.data.list || [];
+      list.value = (res.data.data.list || []).map((item) => ({
+        ...item,
+        ref_url: parseRefUrl(item.ref_url),
+      }));
       total.value = res.data.data.total || 0;
     } else {
       ElMessage.error(res.data.msg || "加载失败");
@@ -246,6 +297,29 @@ const loadList = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const parseRefUrl = (refUrl) => {
+  // console.log("原始 ref_url:", refUrl, "类型:", typeof refUrl);
+  if (!refUrl) return [];
+  if (Array.isArray(refUrl)) {
+    // console.log("已经是数组，长度:", refUrl.length);
+    return refUrl;
+  }
+  if (typeof refUrl === "string") {
+    try {
+      const parsed = JSON.parse(refUrl);
+      // console.log("JSON解析后:", parsed, "是数组:", Array.isArray(parsed));
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      // console.log("JSON解析失败，尝试正则提取");
+      const urlRegex = /http[^\s\]]+/g;
+      const urls = refUrl.match(urlRegex) || [];
+      // console.log("正则提取结果:", urls);
+      return urls;
+    }
+  }
+  return [];
 };
 
 const changePage = (newPage) => {
@@ -570,6 +644,58 @@ onMounted(() => {
 .info-value {
   color: var(--text-primary);
   flex: 1;
+}
+
+.ref-images {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.ref-more {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.no-ref {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.ref-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+.ref-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.ref-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.ref-image {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.ref-image:hover {
+  transform: scale(1.05);
 }
 
 @media (max-width: 768px) {
